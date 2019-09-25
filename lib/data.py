@@ -3,8 +3,9 @@ import cv2
 import datetime
 import os
 import time
+import shutil
 
-class Add_data:
+class Data:
     def get_time_string():
         return datetime.datetime.now().strftime("%I%M%m%d%Y")
     
@@ -12,9 +13,29 @@ class Add_data:
         if not os.path.exists(str):
             os.makedirs(str)
 
-    def add(name):
+    def add(i ,name, img):
+        dir = "dataset/face_recognition/" + name + "/"
+        Data.check_and_create_dir(dir)
+        img_item = dir + str(i) + Data.get_time_string() +".png"
+        cv2.imwrite(img_item, img)
+    
+    def del_temp():
+        dir = "dataset/face_recognition/temp" 
+        shutil.rmtree(dir, ignore_errors=True)
+
+    def add_from_temp(name):
+        dest = "dataset/face_recognition/" + name + "/"
+        Data.check_and_create_dir(dest)
+        source = 'dataset/face_recognition/temp/'
+        files = os.listdir(source)
+
+        for f in files:
+            shutil.move(source+f, dest)
+    
+    
+    def add_data(name):
         dir = "dataset/face_recognition" + name + "/"
-        Add_data.check_and_create_dir(dir)
+        Data.check_and_create_dir(dir)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
         cap = cv2.VideoCapture(0)
@@ -29,7 +50,7 @@ class Add_data:
                 print(x, y, w, h)   
                 roi_gray = gray[y:y+h, x:x+w] #(ycoordina_start, ycoordina_end)
                 roi_color = frame[y:y+h, x:x+w]
-                img_item = dir + str(i) + Add_data.get_time_string() +".png"
+                img_item = dir + str(i) + Data.get_time_string() +".png"
                 cv2.imwrite(img_item, roi_gray)
 
                 color = (102, 255, 102) #BGR 0-255
