@@ -13,7 +13,7 @@ class Add_data:
             os.makedirs(str)
 
     def add(name):
-        dir = "dataset/" + name + "/"
+        dir = "dataset/face_recognition" + name + "/"
         Add_data.check_and_create_dir(dir)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
