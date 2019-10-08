@@ -6,7 +6,7 @@ import pickle
 #The endswith() method returns True if the string ends with the specified value, otherwise False.
 class Label_training:
   def train():
-    image_dir = "dataset/face_recognition"
+    image_dir = "dataset/face_recognition/"
 
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -17,7 +17,7 @@ class Label_training:
     x_train = []
 
     for root, dirs, files in os.walk(image_dir):
-        if (dirs != 'fake' and dir != 'real' ):
+        if (dirs != 'dataset/face_recognition/fake' and dir != 'dataset/face_recognition/real' ):
             for file in files:
                     if file.endswith("png") or file.endswith("jpg"):
                         path = os.path.join(root, file)

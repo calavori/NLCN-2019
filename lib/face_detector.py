@@ -3,6 +3,9 @@ import numpy as np
 import cv2 
 import pickle
 from data import Data
+from keras.models import load_model
+from keras.preprocessing.image import img_to_array
+
 class Face_detector:
     def __init__(self):
         self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -11,6 +14,12 @@ class Face_detector:
         self.cap = cv2.VideoCapture(0)
 
     def detect(self):
+        # load the liveness detector model and label encoder from disk
+        print("[INFO] loading liveness detector...")
+        live_model = load_model('dataset/liveness_model/liveness.model')
+        le = pickle.loads(open('dataset/liveness_model/livenesspickle.le', "rb").read())
+
+        # load face detect model
         self.recognizer.read("dataset/face_model/trainner.yml")
         with open("dataset/face_model/labels.pickle", 'rb') as f: #wb writing bytes, f file
             og_labels = pickle.load(f)
@@ -25,12 +34,27 @@ class Face_detector:
                 print(x, y, w, h)   
                 roi_gray = gray[y:y+h, x:x+w] #(ycoordina_start, ycoordina_end)
                 roi_color = frame[y:y+h, x:x+w]
+                
+                # Detect liveness
+                face = cv2.resize(roi_color, (32, 32))
+                face = face.astype("float") / 255.0
+                face = img_to_array(face)
+                face = np.expand_dims(face, axis=0)
+                preds = live_model.predict(face)[0]
+                j = np.argmax(preds)
+                live_label = le.classes_[j]
+
+                # Recognize face
                 id_, conf = self.recognizer.predict(roi_gray)
                 if conf>=45 and conf <=85:
-                    print(id_)
-                    print(self.labels[id_])
+                    if(live_label == 'dataset/liveness_detector/real'):
+                        print(id_)
+                        print(self.labels[id_])
+                        name = self.labels[id_]
+                    else:
+                        print('fake')
+                        name = 'fake'
                     font = cv2.FONT_HERSHEY_SIMPLEX
-                    name = self.labels[id_]
                     color = (255, 255, 255)
                     stroke= 2
                     cv2.putText(frame, name, (x,y), font, 1, color, stroke, cv2.LINE_AA)
@@ -38,18 +62,12 @@ class Face_detector:
 
                 self.display(frame, x, y, w, h)
             i+=1
-
             cv2.imshow('frame', frame)
             if cv2.waitKey(20) & 0xFF == ord('q'):
                 break
                 
         self.cap.release()
         cv2.destroyAllWindows()
-
-
-
-
-
 
     def display(self, frame, x, y, w, h):
         color = (102, 255, 102) #BGR 0-255
@@ -58,3 +76,7 @@ class Face_detector:
         end_cord_y = y + h  #chieu cao
         cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, stroke) #Tạo khung
 
+
+            
+
+            
