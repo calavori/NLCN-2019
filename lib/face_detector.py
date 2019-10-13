@@ -29,7 +29,7 @@ class Face_detector:
             #Capture frame 1 1
             ret, frame = self.cap.read()
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5) # This parameter will affect the quality of the detected face
+            faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5,minSize=(150,150)) # This parameter will affect the quality of the detected face
             for (x, y, w, h) in faces: # Toa Do
                 print(x, y, w, h)   
                 roi_gray = gray[y:y+h, x:x+w] #(ycoordina_start, ycoordina_end)
@@ -46,7 +46,7 @@ class Face_detector:
 
                 # Recognize face
                 id_, conf = self.recognizer.predict(roi_gray)
-                if conf>=45 and conf <=85:
+                if conf>=30 and conf <=50:
                     if(live_label == 'dataset/liveness_detector/real'):
                         print(id_)
                         print(self.labels[id_])
@@ -54,11 +54,14 @@ class Face_detector:
                     else:
                         print('fake')
                         name = 'fake'
-                    font = cv2.FONT_HERSHEY_SIMPLEX
-                    color = (255, 255, 255)
-                    stroke= 2
-                    cv2.putText(frame, name, (x,y), font, 1, color, stroke, cv2.LINE_AA)
-                Data.add(i, 'temp', roi_gray)
+                # Data.add(i, 'temp', roi_gray)
+                else:
+                    print('Unknown')
+                    name = 'Unknown'
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                color = (255, 255, 255)
+                stroke= 2
+                cv2.putText(frame, name, (x,y), font, 1, color, stroke, cv2.LINE_AA)
 
                 self.display(frame, x, y, w, h)
             i+=1

@@ -34,18 +34,17 @@ class Data:
     
     
     def add_data(name):
-        dir = "dataset/face_recognition" + name + "/"
+        dir = "dataset/face_recognition/" + name + "/"
         Data.check_and_create_dir(dir)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
         cap = cv2.VideoCapture(0)
-        timeout = time.time() + 10
         i=0
-        while (time.time() <= timeout):
+        while 1:
             #Capture frame 1 1
             ret, frame = cap.read()
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5) # This parameter will affect the quality of the detected face
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5,minSize=(150,150)) # This parameter will affect the quality of the detected face
             for (x, y, w, h) in faces: # Toa Do
                 print(x, y, w, h)   
                 roi_gray = gray[y:y+h, x:x+w] #(ycoordina_start, ycoordina_end)

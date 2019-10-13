@@ -28,7 +28,10 @@ class Test:
             name = input('Input name: ')
             Data.add_from_temp(name)
         if option == '6':
-            Data.del_temp() 
+            Data.del_temp()
+        if option == 'q':
+            break
+
 
         
 

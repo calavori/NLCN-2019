@@ -35,12 +35,8 @@ class Label_training:
                         final_image = pil_image.resize(size, Image.ANTIALIAS)            
                         image_array = np.array(pil_image, "uint8")
                         print(image_array)
-                        faces = face_cascade.detectMultiScale(image_array, scaleFactor=1.5, minNeighbors=5) 
-
-                        for (x,y,w,h) in faces:
-                            roi = image_array[y:y+h, x:x+w]
-                            x_train.append(roi)
-                            y_labels.append(id_)
+                        x_train.append(image_array)
+                        y_labels.append(id_)
     print(y_labels)
     print(x_train)
     with open("dataset/face_model/labels.pickle", 'wb') as f: #wb writing bytes, f file
