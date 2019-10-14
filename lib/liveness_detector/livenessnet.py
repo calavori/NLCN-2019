@@ -21,7 +21,7 @@ class LivenessNet:
 		# if we are using "channels first", update the input shape
 		# and channels dimension
 		if K.image_data_format() == "channels_first":
-			inputShape = (depth, height, width)
+			inputShape = (depth , height, width)
 			chanDim = 1
             # first CONV => RELU => CONV => RELU => POOL layer set
 		model.add(Conv2D(16, (3, 3), padding="same", input_shape=inputShape))
