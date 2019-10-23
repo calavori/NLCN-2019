@@ -3,6 +3,7 @@ from liveness_detector.liveness_training import Liveness_training
 from label_training import Label_training
 from face_detector import Face_detector
 
+
 class Test:
     while(True):
         print("Option:")

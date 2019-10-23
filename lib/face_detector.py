@@ -31,34 +31,32 @@ class Face_detector:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5,minSize=(120,120)) # This parameter will affect the quality of the detected face
             for (x, y, w, h) in faces: # Toa Do
-                print(x, y, w, h)   
+                # print(x, y, w, h)   
                 roi_gray = gray[y:y+h, x:x+w] #(ycoordina_start, ycoordina_end)
                 roi_color = frame[y:y+h, x:x+w]
                 
                 # Detect liveness
                 live_label = self.liveness_detect(roi_color)
-                if (live_label == 'dataset/liveness_detector/fake'):
-                    print('fake')
-                    name = 'fake'
-                elif(live_label == 'dataset/liveness_detector/real'):
+                if(live_label == 'dataset/liveness_detector/real'):
 
                     # Recognize face
                     id_, conf = self.recognizer.predict(roi_gray)
                     if conf <=50:
-                        print(id_)
-                        print(self.labels[id_])
+                        print(self.labels[id_] + ': ' + str(conf))
                         name = self.labels[id_]
                     
                 # Data.add(i, 'temp', roi_gray)
                     else:
                         print('Unknown')
                         name = 'Unknown'
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                color = (255, 255, 255)
-                stroke= 2
-                cv2.putText(frame, name, (x,y), font, 1, color, stroke, cv2.LINE_AA)
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    color = (255, 255, 255)
+                    stroke= 2
+                    cv2.putText(frame, name, (x,y), font, 1, color, stroke, cv2.LINE_AA)
 
-                self.display(frame, x, y, w, h)
+                    self.display(frame, x, y, w, h)
+                else:
+                    print('Fake')
             i+=1
             cv2.imshow('frame', frame)
             if cv2.waitKey(20) & 0xFF == ord('q'):

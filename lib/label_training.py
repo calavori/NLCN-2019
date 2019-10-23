@@ -30,16 +30,14 @@ class Label_training:
                         print(label_ids)
                         #y_labels.append(label) #number
                         #x_train.append(path) # verify image, turn Numy array
-                        pil_image = Image.open(path).convert("L") #grayscale
-                        size = (550, 550)
-                        final_image = pil_image.resize(size, Image.ANTIALIAS)            
+                        pil_image = Image.open(path).convert("L") #grayscale          
                         image_array = np.array(pil_image, "uint8")
                         print(image_array)
                         x_train.append(image_array)
                         y_labels.append(id_)
     print(y_labels)
     print(x_train)
-    with open("dataset/face_model/labels.pickle", 'wb') as f: #wb writing bytes, f file
+    with open("dataset/face_model/labels.pickle", 'r+b') as f: #wb writing bytes, f file
         pickle.dump(label_ids, f)
 
     recognizer.train(x_train, np.array(y_labels))

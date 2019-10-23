@@ -40,17 +40,17 @@ class Data:
 
         cap = cv2.VideoCapture(0)
         i=0
-        while 1:
+        while i<150:
             #Capture frame 1 1
             ret, frame = cap.read()
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5,minSize=(150,150)) # This parameter will affect the quality of the detected face
             for (x, y, w, h) in faces: # Toa Do
                 print(x, y, w, h)   
-                roi_gray = gray[y:y+h, x:x+w] #(ycoordina_start, ycoordina_end)
                 roi_color = frame[y:y+h, x:x+w]
                 img_item = dir + str(i) + Data.get_time_string() +".png"
-                cv2.imwrite(img_item, roi_gray)
+                cv2.imwrite(img_item, roi_color)
+                i+=1
 
                 color = (102, 255, 102) #BGR 0-255
                 stroke = 1
@@ -61,7 +61,7 @@ class Data:
             cv2.imshow('frame', frame)
             if cv2.waitKey(20) & 0xFF == ord('q'):
                     break
-            i+=1
+            
 
         cap.release()
         cv2.destroyAllWindows()
