@@ -15,10 +15,15 @@ class Test:
         print("6. Delete temp folder")
         print("7. Add data for liveness detector")
         print("8. Test liveness detector")
+        print("9. Test edit dataset")
+        print("10. Test delete dataset")
         option = input("Your option: ")
         if option == "1":
+            id = input("Enter your id: ")
             name = input("Enter your name: ")
-            Data.add_data(name)
+            data = Data()
+            data.addDb_student(id, name)
+            data.add_data(id, name)
         if option == "2":
             liveness = Liveness_training()
             liveness.train()
@@ -41,6 +46,15 @@ class Test:
         if option == '8':
             face_detector = Face_detector()
             face_detector.liveness_test()
+        if option == '9':
+            id = input("enter student id: ")
+            data = Data()
+            data.edit_data(id)
+        if option == '10':
+            id = input("enter student id: ")
+            data = Data()
+            data.del_data(id)
+        
         if option == 'q':
             break
 

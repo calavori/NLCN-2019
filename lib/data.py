@@ -4,38 +4,51 @@ import datetime
 import os
 import time
 import shutil
+import mysql.connector
 
 class Data:
-    def get_time_string():
+    def __init__(self):
+        self.mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="linhkiet_2291998",
+            database="project"
+            )
+        self.cursor = self.mydb.cursor()
+    
+    def __del__(self):
+        self.mydb.close()
+
+    def get_time_string(self):
         return datetime.datetime.now().strftime("%I%M%m%d%Y")
     
-    def check_and_create_dir(str):
+    def check_and_create_dir(self,str):
         if not os.path.exists(str):
             os.makedirs(str)
 
-    def add(i ,name, img):
-        dir = "dataset/face_recognition/" + name + "/"
-        Data.check_and_create_dir(dir)
-        img_item = dir + str(i) + Data.get_time_string() +".png"
-        cv2.imwrite(img_item, img)
+    # def add(self, i ,name, img):
+    #     dir = "dataset/face_recognition/" + name + "/"
+    #     Data.check_and_create_dir(dir)
+    #     img_item = dir + str(i) + Data.get_time_string() +".png"
+    #     cv2.imwrite(img_item, img)
     
-    def del_temp():
-        dir = "dataset/face_recognition/temp" 
-        shutil.rmtree(dir, ignore_errors=True)
+    def del_old(self, f_name):
+        dir = "dataset/face_recognition/" + f_name
+        os.remove(dir)
 
-    def add_from_temp(name):
-        dest = "dataset/face_recognition/" + name + "/"
-        Data.check_and_create_dir(dest)
-        source = 'dataset/face_recognition/temp/'
-        files = os.listdir(source)
+    # def add_from_temp(self, name):
+    #     dest = "dataset/face_recognition/" + name + "/"
+    #     Data.check_and_create_dir(dest)
+    #     source = 'dataset/face_recognition/temp/'
+    #     files = os.listdir(source)
 
-        for f in files:
-            shutil.move(source+f, dest)
+    #     for f in files:
+    #         shutil.move(source+f, dest)
     
     
-    def add_data(name):
-        dir = "dataset/face_recognition/" + name + "/"
-        Data.check_and_create_dir(dir)
+    def add_data(self, s_id):
+        dir = "dataset/face_recognition/" 
+        self.check_and_create_dir(dir)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
         cap = cv2.VideoCapture(0)
@@ -48,8 +61,10 @@ class Data:
             for (x, y, w, h) in faces: # Toa Do
                 print(x, y, w, h)   
                 roi_color = frame[y:y+h, x:x+w]
-                img_item = dir + str(i) + Data.get_time_string() +".png"
+                pic_id = str(i) + self.get_time_string()
+                img_item = dir + pic_id +".png"
                 cv2.imwrite(img_item, roi_color)
+                self.addDb_dataset(pic_id, s_id)
                 i+=1
 
                 color = (102, 255, 102) #BGR 0-255
@@ -66,9 +81,24 @@ class Data:
         cap.release()
         cv2.destroyAllWindows()
 
-    def addLiveData(name):
+    def edit_data(self,s_id):
+        old = self.getDb_dataset(s_id)
+        self.add_data(s_id)
+        for i in old:
+            self.delDb_dataset(i)
+            self.del_old(i + '.png')
+
+    def del_data(self, s_id):
+        data = self.getDb_dataset(s_id)
+        for i in data:
+            self.delDb_dataset(i)
+            self.del_old(i + '.png')
+        self.delDb_student(s_id)
+
+
+    def addLiveData(self, name):
         dir = "dataset/liveness_detector/" + name + "/"
-        Data.check_and_create_dir(dir)
+        self.check_and_create_dir(dir)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
         cap = cv2.VideoCapture(0)
@@ -80,7 +110,7 @@ class Data:
             for (x, y, w, h) in faces: # Toa Do
                 print(x, y, w, h)   
                 roi_color = frame[y:y+h, x:x+w]
-                img_item = dir + str(i) + Data.get_time_string() +".png"
+                img_item = dir + str(i) + self.get_time_string() +".png"
                 cv2.imwrite(img_item, roi_color)
 
                 color = (102, 255, 102) #BGR 0-255
@@ -96,5 +126,48 @@ class Data:
 
         cap.release()
         cv2.destroyAllWindows()
+
+    def addDb_dataset(self, pic_id, s_id):
+        query = 'insert into `dataset` values(%s, %s)'
+        val = (pic_id, s_id)
+        self.cursor.execute(query, val)
+        self.mydb.commit()
+
+    def addDb_student(self, s_id, name):
+        querry = 'insert into `students` values(%s, %s)'
+        val = (s_id, name)
+        self.cursor.execute(querry, val)
+        self.mydb.commit()
+
+    def delDb_dataset(self, id):
+        query = 'delete from `dataset` where id = %s'
+        val = (id,)
+        self.cursor.execute(query, val)
+        self.mydb.commit()
+
+    def getDb_dataset(self, s_id):
+        list = []
+        query = 'select id from `dataset` where s_id = %s'
+        val = (s_id,)
+        self.cursor.execute(query, val)
+        result = self.cursor.fetchall()
+        for x in result:
+            list.append(x[0])
+        return list
+    
+    def delDb_student(self, id):
+        query = 'delete from `students` where id = %s'
+        val = (id,)
+        self.cursor.execute(query, val)
+        self.mydb.commit()
+
+
+
+
+
+        
+        
+        
+
 
     
