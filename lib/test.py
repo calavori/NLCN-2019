@@ -17,13 +17,14 @@ class Test:
         print("8. Test liveness detector")
         print("9. Test edit dataset")
         print("10. Test delete dataset")
+        print('11. Test home GUI')
         option = input("Your option: ")
         if option == "1":
             id = input("Enter your id: ")
             name = input("Enter your name: ")
             data = Data()
             data.addDb_student(id, name)
-            data.add_data(id, name)
+            data.add_data(id)
         if option == "2":
             liveness = Liveness_training()
             liveness.train()

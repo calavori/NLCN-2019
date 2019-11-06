@@ -50,6 +50,7 @@ class Data:
         dir = "dataset/face_recognition/" 
         self.check_and_create_dir(dir)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        list_img = []
 
         cap = cv2.VideoCapture(0)
         i=0
@@ -64,7 +65,7 @@ class Data:
                 pic_id = str(i) + self.get_time_string()
                 img_item = dir + pic_id +".png"
                 cv2.imwrite(img_item, roi_color)
-                self.addDb_dataset(pic_id, s_id)
+                list_img.append(pic_id)
                 i+=1
 
                 color = (102, 255, 102) #BGR 0-255
@@ -80,16 +81,22 @@ class Data:
 
         cap.release()
         cv2.destroyAllWindows()
+        self.save_image_to_db(list_img, s_id)
+        
+        
+    def save_image_to_db(self, list, s_id):
+        for i in list:
+            self.addDb_dataset(i, s_id)
 
     def edit_data(self,s_id):
-        old = self.getDb_dataset(s_id)
+        old = self.getDb_dataset_id(s_id)
         self.add_data(s_id)
         for i in old:
             self.delDb_dataset(i)
             self.del_old(i + '.png')
 
     def del_data(self, s_id):
-        data = self.getDb_dataset(s_id)
+        data = self.getDb_dataset_id(s_id)
         for i in data:
             self.delDb_dataset(i)
             self.del_old(i + '.png')
@@ -145,7 +152,7 @@ class Data:
         self.cursor.execute(query, val)
         self.mydb.commit()
 
-    def getDb_dataset(self, s_id):
+    def getDb_dataset_id(self, s_id):
         list = []
         query = 'select id from `dataset` where s_id = %s'
         val = (s_id,)
@@ -160,6 +167,38 @@ class Data:
         val = (id,)
         self.cursor.execute(query, val)
         self.mydb.commit()
+
+    def getDb_dataset_sid(self, id):
+        query = 'select s_id from `dataset` where id = %s'
+        val = (id,)
+        self.cursor.execute(query, val)
+        result = self.cursor.fetchone()
+        return result[0]
+
+    def getDb_students_name(self, id):
+        query = 'select name from `student` where id = %s'
+        val = (id,)
+        self.cursor.execute(query, val)
+        result = self.cursor.fetchone()
+        return result[0]
+
+    def getDb_attendace(self, date):
+        list = []
+        query = "call attendList(%s);"
+        val = (date,)
+        self.cursor.execute(query, val)
+        result = self.cursor.fetchall()
+        for x in result:
+            y = ( x[0], x[1], x[2], str(x[3]), x[4] )
+            list.append(y)
+        return list
+
+
+
+
+
+
+        
 
 
 

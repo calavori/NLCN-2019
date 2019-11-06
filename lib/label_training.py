@@ -3,10 +3,13 @@ from PIL import Image
 import numpy as np
 import cv2
 import pickle
+from data import Data
+
 #The endswith() method returns True if the string ends with the specified value, otherwise False.
 class Label_training:
   def train():
     image_dir = "dataset/face_recognition/"
+    data = Data()
 
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -21,22 +24,23 @@ class Label_training:
             for file in files:
                     if file.endswith("png") or file.endswith("jpg"):
                         path = os.path.join(root, file)
-                        label = os.path.basename(root).replace(" ", "-").lower()
-                        print(label, path)
+                        temp = file.split('.')
+                        label = data.getDb_dataset_sid(temp[0])
+                        print('training id ' + label)
                         if not label in label_ids:
                             label_ids[label] = current_id
                             current_id += 1
                         id_ = label_ids[label]
-                        print(label_ids)
+                        # print(label_ids)
                         #y_labels.append(label) #number
                         #x_train.append(path) # verify image, turn Numy array
                         pil_image = Image.open(path).convert("L") #grayscale          
                         image_array = np.array(pil_image, "uint8")
-                        print(image_array)
+                        # print(image_array)
                         x_train.append(image_array)
                         y_labels.append(id_)
-    print(y_labels)
-    print(x_train)
+    # print(y_labels)
+    # print(x_train)
     with open("dataset/face_model/labels.pickle", 'r+b') as f: #wb writing bytes, f file
         pickle.dump(label_ids, f)
 

@@ -5,7 +5,7 @@ import pickle
 from data import Data
 from keras.models import load_model
 from keras.preprocessing.image import img_to_array
-
+from data import Data
 class Face_detector:
     def __init__(self):
         self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
