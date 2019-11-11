@@ -36,6 +36,8 @@ class Data:
         dir = "dataset/face_recognition/" + f_name
         os.remove(dir)
 
+    
+
     # def add_from_temp(self, name):
     #     dest = "dataset/face_recognition/" + name + "/"
     #     Data.check_and_create_dir(dest)
@@ -82,6 +84,7 @@ class Data:
         cap.release()
         cv2.destroyAllWindows()
         self.save_image_to_db(list_img, s_id)
+        print('Data added')
         
         
     def save_image_to_db(self, list, s_id):
@@ -134,6 +137,9 @@ class Data:
         cap.release()
         cv2.destroyAllWindows()
 
+
+    # Database
+
     def addDb_dataset(self, pic_id, s_id):
         query = 'insert into `dataset` values(%s, %s)'
         val = (pic_id, s_id)
@@ -176,7 +182,7 @@ class Data:
         return result[0]
 
     def getDb_students_name(self, id):
-        query = 'select name from `student` where id = %s'
+        query = 'select name from `students` where id = %s'
         val = (id,)
         self.cursor.execute(query, val)
         result = self.cursor.fetchone()
@@ -193,6 +199,36 @@ class Data:
             list.append(y)
         return list
 
+    def getDb_students(self):
+        list = []
+        query = "select * from students;"
+        self.cursor.execute(query)
+        result = self.cursor.fetchall()
+        for x in result:
+            list.append(x)
+        return list
+
+    def SearchDb_students(self, keyword):
+        list = []
+        query = "select * from students where id = %s or name = %s;"
+        val = (keyword, keyword)
+        self.cursor.execute(query, val)
+        result = self.cursor.fetchall()
+        for x in result:
+            list.append(x)
+        return list   
+
+    def addDb_attendance(self, s_id, d_id):
+        query = "call attend(%s, %s);"
+        val = (d_id, s_id)
+        self.cursor.execute(query, val)
+        self.mydb.commit()
+
+    def editDb_studentName(self, id, name):
+        query = "Update students set name = %s where id =%s "
+        val = (name, id)
+        self.cursor.execute(query, val)
+        self.mydb.commit()
 
 
 

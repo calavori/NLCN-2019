@@ -22,7 +22,7 @@ class Label_training:
     for root, dirs, files in os.walk(image_dir):
         if (dirs != 'dataset/face_recognition/fake' and dir != 'dataset/face_recognition/real' ):
             for file in files:
-                    if file.endswith("png") or file.endswith("jpg"):
+                    if file.endswith("png"):
                         path = os.path.join(root, file)
                         temp = file.split('.')
                         label = data.getDb_dataset_sid(temp[0])
@@ -41,8 +41,10 @@ class Label_training:
                         y_labels.append(id_)
     # print(y_labels)
     # print(x_train)
-    with open("dataset/face_model/labels.pickle", 'r+b') as f: #wb writing bytes, f file
+    with open("dataset/face_model/labels.pickle", 'wb') as f: #wb writing bytes, f file
         pickle.dump(label_ids, f)
 
     recognizer.train(x_train, np.array(y_labels))
     recognizer.save("dataset/face_model/trainner.yml")
+
+    print('Train completed')
